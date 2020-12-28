@@ -114,6 +114,6 @@ def generateKey(key):
             for j in range(4):
                 wordSub = wordSub + subWordTable[int(wordRot[0+2*j], 16)][int(wordRot[1+2*j], 16)]
         # else:
-
+# s
       
 
