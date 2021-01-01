@@ -1,5 +1,5 @@
 # from fractions import *
-# import numpy as np
+import numpy as np
 # # print("hello world")
 # # a = 1
 # # b = 2
@@ -36,28 +36,29 @@
 # str = "010110"
 # a = int("16") << 1
 # print(a)
-def hex2bin(s): 
-    mp = {'0' : "0000",  
-          '1' : "0001", 
-          '2' : "0010",  
-          '3' : "0011", 
-          '4' : "0100", 
-          '5' : "0101",  
-          '6' : "0110", 
-          '7' : "0111",  
-          '8' : "1000", 
-          '9' : "1001",  
-          'A' : "1010", 
-          'B' : "1011",  
-          'C' : "1100", 
-          'D' : "1101",  
-          'E' : "1110", 
-          'F' : "1111" } 
-    bin = "" 
-    for i in range(len(s)): 
-        bin = bin + mp[s[i]] 
-    return bin
-    
-key = "FE01FE01FE01FE01"
-shiftKey = key[1:None] + key[0: 1]
-print(shiftKey)
+
+# Program to multiply two matrices using nested loops
+
+# 3x3 matrix
+X = np.array([[12,7,3],
+    [4 ,5,6],
+    [7 ,8,9]])
+# 3x4 matrix
+Y = np.array([[5],
+    [6],
+    [4]])
+# result is 3x4
+
+result = np.array([[0 for x in range(1)] for y in range(3)])
+# iterate through rows of X
+for i in range(len(X)):
+   # iterate through columns of Y
+   for j in range(len(Y[0])):
+       # iterate through rows of Y
+       for k in range(len(Y)):
+           result[i][j] += X[i][k] * Y[k][j]
+
+
+for r in result:
+   print(r)
+print(X.dot(Y))

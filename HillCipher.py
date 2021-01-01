@@ -1,5 +1,5 @@
 import numpy as np
-# P = “matmahoa”
+
 A = np.array([
     [12, 0, 19],
     [12, 0, 7],
