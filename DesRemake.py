@@ -1,4 +1,5 @@
 import math
+import numpy as np
 sBox1 = [
     [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],
     [0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],
@@ -48,7 +49,7 @@ sBox8 = [
     [2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11]
 ]
 sBox = [sBox1,sBox2,sBox3,sBox4,sBox5,sBox6,sBox7,sBox8]
-compession = [
+compessionPBox = [
     [14, 17, 11, 24, 1, 5, 3, 28],
     [15, 6, 21, 10, 23, 19, 12, 4],
     [26, 8, 16, 7, 27, 20, 13, 2],
@@ -56,12 +57,14 @@ compession = [
     [51, 45, 33, 48, 44, 49, 39, 56],
     [34, 53, 46, 42, 50, 36, 29, 32]
 ]
+
 straightPBox = [
     [16, 7, 20, 21, 29, 12, 28, 17],
     [1, 15, 23, 26, 5, 18, 31, 10],
     [2, 8, 24, 14, 32, 27, 3, 9],
     [19, 13, 30, 6, 22, 11, 4, 25]
 ]
+
 initialMatrix = [
     [58, 50, 42, 34, 26, 18, 10, 2],
     [60, 52, 44, 36, 28, 20, 12, 4],
@@ -72,6 +75,7 @@ initialMatrix = [
     [61, 53, 45, 37, 29, 21, 13, 5],
     [63, 55, 47, 39, 31, 23, 15, 7]
 ]
+
 parityDrop = [
     [57, 49, 41, 33, 25, 17, 9, 1],
     [58, 50, 42, 34, 26, 18, 10, 2],
@@ -87,7 +91,7 @@ shiftTable = [ 1, 1, 2, 2,
                 1, 2, 2, 2,  
                 2, 2, 2, 1 ]
 
-pBox = [
+expansionPBox = [
     [32, 1, 2, 3, 4, 5],
     [4, 5, 6, 7, 8, 9],
     [8, 9, 10, 11, 12, 13],
@@ -97,6 +101,7 @@ pBox = [
     [24, 25, 26, 27, 28, 29],
     [28, 29, 30, 31, 32, 1]
 ]
+
 finalMatrix = [
     [40, 8, 48, 16, 56, 24, 64, 32],  
     [39, 7, 47, 15, 55, 23, 63, 31],  
@@ -108,6 +113,69 @@ finalMatrix = [
     [33, 1, 41, 9, 49, 17, 57, 25]
 ]
 
+def hex2bin(s):
+    mp = {'0' : "0000",  
+          '1' : "0001", 
+          '2' : "0010",  
+          '3' : "0011", 
+          '4' : "0100", 
+          '5' : "0101",  
+          '6' : "0110", 
+          '7' : "0111",  
+          '8' : "1000", 
+          '9' : "1001",  
+          'A' : "1010", 
+          'B' : "1011",  
+          'C' : "1100", 
+          'D' : "1101",  
+          'E' : "1110", 
+          'F' : "1111" }
+    bin = "" 
+    for i in range(len(s)): 
+        bin = bin + mp[s[i]] 
+    return bin
+      
+def bin2hex(s): 
+    mp = {"0000" : '0',  
+          "0001" : '1', 
+          "0010" : '2',  
+          "0011" : '3', 
+          "0100" : '4', 
+          "0101" : '5',  
+          "0110" : '6', 
+          "0111" : '7',  
+          "1000" : '8', 
+          "1001" : '9',  
+          "1010" : 'A', 
+          "1011" : 'B',  
+          "1100" : 'C', 
+          "1101" : 'D',  
+          "1110" : 'E', 
+          "1111" : 'F' } 
+    hex = "" 
+    for i in range(0,len(s),4): 
+        ch = "" 
+        ch = ch + s[i] 
+        ch = ch + s[i + 1]  
+        ch = ch + s[i + 2]  
+        ch = ch + s[i + 3]  
+        hex = hex + mp[ch] 
+          
+    return hex
+
+def bin2dec(binary):  
+    return str(int(binary,2)) 
+  
+def dec2bin(num):  
+    res = bin(num).replace("0b", "") 
+    if(len(res)%4 != 0): 
+        div = len(res) / 4
+        div = int(div) 
+        counter =(4 * (div + 1)) - len(res)  
+        for _ in range(0, counter): 
+            res = '0' + res 
+    return res 
+
 def useMatrix(bitStr, matrix):
     rs = ""
     countRow = len(matrix)
@@ -118,78 +186,82 @@ def useMatrix(bitStr, matrix):
             rs += bitStr[position]
     return rs
 
-def xor(bit1str, bit2str):
-    bit1 = int(bit1str)
-    bit2 = int(bit2str)
-    if bool(bit1) ^ bool(bit2):
-        return '1'
-    return '0'
+def shiftLeftKey(key, count):
+    return key[count:None] + key[0:count]
 
-# find round key
-keyHex = "fe01fe01fe01fe01"
-keyBit = "{0:064b}".format(int(keyHex, 16))
-keyBitDrop = useMatrix(keyBit, parityDrop)
-keyLeft = keyBitDrop[0:28]
-keyRight = keyBitDrop[28:56]
+def add(bit1, bit2):
+    rs = ""
+    for i in range(len(bit1)):
+        if bool(int(bit1[i])) ^ bool(int(bit2[i])):
+            rs = rs +  '1'
+        else:
+            rs = rs +  '0'
+    return rs
 
-listRoundKey = []
-for count in range(16):
-    roundKey = ""
-    keyLeft = keyLeft[shiftTable[count]:None] + keyLeft[0:shiftTable[count]]
-    keyRight = keyRight[shiftTable[count]:None] + keyRight[0:shiftTable[count]]
+roundKeys = []
 
-    inPutCompesion = keyLeft + keyRight
-    roundKey = useMatrix(inPutCompesion, compession)
-    listRoundKey.append(roundKey)
+def generateKey(keyHex):
+    keyBit = hex2bin(keyHex)
+    keyParityDrop = useMatrix(keyBit, parityDrop)
+    keyLeft = keyParityDrop[0:28]
+    keyRight = keyParityDrop[28:56]
+    for i in range(16):    
+        keyLeft = shiftLeftKey(keyLeft, shiftTable[i])
+        keyRight = shiftLeftKey(keyRight, shiftTable[i])
+        keyParityDrop = keyLeft + keyRight
+        keyRightCompresion = useMatrix(keyParityDrop, compessionPBox)
+        roundKeys.append(bin2hex(keyRightCompresion))
 
-# find L, R
-# plainTextHex = "0123456789ABCDEF"
-plainTextHex = "FE44E3310FD98327"
-plainTextBit = "{0:064b}".format(int(plainTextHex, 16))
-initial = useMatrix(plainTextBit, initialMatrix)
-L0 = initial[0:32]
-R0 = initial[32:64]
-
-for count in range(16):
-    print("Round: " + str(count+1))
-    print("key : " + '%08X' % int(listRoundKey[count], 2))
-
-    # R0 explan
-    outputPbox = useMatrix(R0, pBox)
-    
-    # find input Sbox
-    inputSbox = ""
-    for i in range(48):
-        # inputSbox = inputSbox + xor(outputPbox[i], listRoundKey[count][i])
-        inputSbox = inputSbox + xor(outputPbox[i], listRoundKey[15-count][i])
-
-    # find output Sbox
-    outputSbox = ""
+def throughSBox(bit):
+    rs = ""
     for i in range(8):
-        hangBit = inputSbox[i*6] + inputSbox[i*6+5]
-        cotBit = inputSbox[i*6+1] + inputSbox[i*6+2] + inputSbox[i*6+3] + inputSbox[i*6+4]
+        hangBit = bit[i*6] + bit[i*6+5]
+        cotBit = bit[i*6+1] + bit[i*6+2] + bit[i*6+3] + bit[i*6+4]
         hang = int(hangBit, 2)
         cot = int(cotBit, 2)
         sBoxElementBit = "{0:04b}".format(int(str(sBox[i][hang][cot]), 10))
-        outputSbox = outputSbox + sBoxElementBit
-    
-    # find output straight Box  
-    outputStraightBox = useMatrix(outputSbox, straightPBox)
-    
-    # find L, R 
-    R = ""
-    for i in range(32):
-        R += xor(outputStraightBox[i], L0[i])
-    L = R0
+        rs = rs + sBoxElementBit
+    return rs
 
+def process(plainTextHex, keyHex, isEncyption):
+    generateKey(keyHex)
+    plainTextBit = hex2bin(plainTextHex)
+    L = [None for x in range(17)]
+    R = [None for x in range(17)]
     
-    print("L: "+'%08X' % int(L, 2))
-    print("R: "+'%08X' % int(R, 2))
-    print("******************************")
-    # prepare next loop
-    L0 = L
-    R0 = R
- 
-inPutFinal = R+L
-cipherText =useMatrix(inPutFinal, finalMatrix)
-print("CipherText: "+'%08X' % int(cipherText, 2))
+    initial = useMatrix(plainTextBit, initialMatrix)
+    L[0] = initial[0:32]
+    R[0] = initial[32:64]
+    for i in range(16):
+        print("Round " + str(i+1))
+        print("Key: "+ roundKeys[i])
+        expansion = useMatrix(R[i], expansionPBox)
+        if(isEncyption):
+            bitXor = add(expansion, hex2bin(roundKeys[i]))
+        else:
+            bitXor = add(expansion, hex2bin(roundKeys[15-i]))
+        bitSBox = throughSBox(bitXor)
+        bitStraightPBox = useMatrix(bitSBox, straightPBox)
+        bitMixer = add(bitStraightPBox, L[i])
+        R[i+1] = bitMixer
+        L[i+1] = R[i]
+        print("Left: "+ L[i+1])
+        print("Right: "+ R[i+1])
+        print("******************************")
+    inputFinalRound = R[16]+L[16]
+    cipherText =useMatrix(inputFinalRound, finalMatrix)
+    return bin2hex(cipherText)
+
+def encryption(plainTextHex, keyHex):
+    return process(plainTextHex, keyHex, True)
+def decryption(plainTextHex, keyHex):
+    return process(plainTextHex, keyHex, False)
+
+# test
+keyHex = "FE01FE01FE01FE01" 
+plainTextHex = "FE44E3310FD98327"
+cipherText = encryption(plainTextHex, keyHex)
+print("CipherText: " + cipherText)
+print("PlainText: " + decryption(cipherText, keyHex))
+
+# giải mã bản tin cipher text thu được đúng bản tin plain text ban đầu

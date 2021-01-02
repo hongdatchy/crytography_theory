@@ -1,1 +1,0 @@
-# không có số cột với số hàng cụ thể nên không muốn làm :))
