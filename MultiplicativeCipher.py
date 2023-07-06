@@ -1,4 +1,4 @@
-from Inverse import enverseOfNumber
+from Inverse import inverseOfNumber
 
 def multiplicativeCipher(plainText, k):
     rs = ""
@@ -16,7 +16,7 @@ def multiplicativeCipher(plainText, k):
 # giai ma
 def desMultiplicativeCipher(cipherText, k):
     rs = ""
-    k = enverseOfNumber(26, k)
+    k = inverseOfNumber(26, k)
     if k == 0: return 0
     for char in cipherText:
         if char.islower():

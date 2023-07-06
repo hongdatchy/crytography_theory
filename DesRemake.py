@@ -254,6 +254,7 @@ def process(plainTextHex, keyHex, isEncyption):
 
 def encryption(plainTextHex, keyHex):
     return process(plainTextHex, keyHex, True)
+
 def decryption(plainTextHex, keyHex):
     return process(plainTextHex, keyHex, False)
 

@@ -4,7 +4,7 @@ def check(a, b):
     if(getGcd(a,b) == 1): return True
     return False
 
-def enverseOfNumber(r1, r2):
+def inverseOfNumber(r1, r2):
     backUpR1 = r1
     if(check(r1, r2) == False):
         return 0 #tuong ung voi khong co nghich dao nhan
@@ -23,3 +23,4 @@ def enverseOfNumber(r1, r2):
         t = t1 - q * t2
     t2 = t2 % backUpR1
     return t2
+# print(inverseOfNumber(26,2039))

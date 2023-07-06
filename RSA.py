@@ -1,5 +1,5 @@
 from GCD import getGcd
-from Inverse import enverseOfNumber
+from Inverse import inverseOfNumber
 def getPrimeNumber(n):
     rs = n
     while(True):
@@ -20,7 +20,7 @@ def generateKey(n):
     n = p*q
     piN = (p-1) * (q-1)
     e = findE(piN)
-    d = enverseOfNumber(piN, e)
+    d = inverseOfNumber(piN, e)
     return [e, d, n]
 
 def sqareAndMultiply(x, H, n):
@@ -42,5 +42,5 @@ C = sqareAndMultiply(P, e , n)
 print(C)
 
 # P = C^d mod n
-# P = sqareAndMultiply(C, d, n)
-# print(P)
+P = sqareAndMultiply(C, d, n)
+print(P)
